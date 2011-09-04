@@ -28,7 +28,13 @@ test3: SMatrix.h SMatrix.cpp test3.cpp
 	$(CXX) $(CPPFLAGS) -o test3 SMatrix.cpp test3.cpp
 	
 mytest0: SMatrix.h SMatrix.cpp mytest0.cpp
-	$(CXX) $(CPPFLAGS) -o mytest0 SMatrix.cpp mytest0.cpp
+	$(CXX) $(CPPFLAGS) -DTEST -o mytest0 SMatrix.cpp mytest0.cpp
+
+mytests: SMatrix.h SMatrix.cpp mytests.cpp
+	$(CXX) $(CPPFLAGS) -DTEST -lboost_unit_test_framework -o mytests SMatrix.cpp mytests.cpp
+
+mytests2: SMatrix.h SMatrix.cpp mytests2.cpp
+	$(CXX) $(CPPFLAGS) -DTEST -lboost_unit_test_framework -o mytests2 SMatrix.cpp mytests2.cpp
 
 clean: 
 	rm -rf *.o a.out core *.dSYM
