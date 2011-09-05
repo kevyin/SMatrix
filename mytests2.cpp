@@ -235,7 +235,6 @@ BOOST_AUTO_TEST_CASE( opmult ) {
         }
       } catch (...) { }
 
-    SMatrix m2 = m * m;
 
     SMatrix::col_map_type colMap; 
     m.buildCols(colMap, SMatrix::size_type(0), m.cols() - 1);
@@ -255,26 +254,21 @@ BOOST_AUTO_TEST_CASE( opmult ) {
         }
     }
 
-    //SMatrix m2(3,2);
-    //m2.setVal(0, 1, 1);
-    //m2.checkIntegrity();
-    //m2.setVal(1, 1, 1);
-    //m2.checkIntegrity();
-
-    //m2.setVal(0, 0, 1);
-    //m2.checkIntegrity();
-    //m2.setVal(1, 1, 1);
-    //m2.checkIntegrity();
-    //m2.setVal(0, 1, 1);
-    //m2.checkIntegrity();
-    //m2.setVal(2, 1, 1);
-    //m2.checkIntegrity();
-
+    //SMatrix m2 = m * m;
     //prettyMatrix(m2);
-    //SMatrix m3 = m*m2;
-    //prettyMatrix(m3);
+    std::cout << m * m << std::endl;
 
+  SMatrix a(50, 10);
+  for (SMatrix::size_type i = 0; i < 5; ++i)
+    for (SMatrix::size_type j = 0; j < 5; ++j)
+      a.setVal(i + 1, j + 1, -1);
 
+  SMatrix b(10, 50);
+  for (SMatrix::size_type i = 0; i < 5; ++i)
+    for (SMatrix::size_type j = 0; j < 5; ++j)
+      b.setVal(i + 1, j + 1, -1);
+
+  //std::cout << a * b << std::endl;
 
     
 }

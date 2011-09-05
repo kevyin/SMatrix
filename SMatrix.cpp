@@ -157,7 +157,7 @@ SMatrix operator*(const SMatrix& lhs, const SMatrix& rhs) throw(MatrixError) {
 
     // foreach row in lhs
     for (SMatrix::ridx_type::const_iterator lit = lhs.ridx_.begin(); 
-         lit != rhs.ridx_.end(); ++lit) {
+         lit != lhs.ridx_.end(); ++lit) {
 
         SMatrix::size_type lhs_row = lit->first;
         SMatrix::row_loc_type loc = lit->second;
@@ -169,14 +169,14 @@ SMatrix operator*(const SMatrix& lhs, const SMatrix& rhs) throw(MatrixError) {
              rit != colMap.end(); ++rit) {
             SMatrix::size_type rhs_col = rit->first;
 
-            SMatrix::col_map_type::mapped_type colvals = rit->second;
+            //SMatrix::col_map_type::mapped_type *colvals = &rit->second;
 
             // calculate value of res(lhs_row,rhs_col)
             int res_val = 0;
             for(size_t li = lstart; li <= llast; ++li) {
                 SMatrix::size_type lhs_col = lhs.cidx_[li];
-                SMatrix::col_map_type::mapped_type::const_iterator colit = colvals.find(lhs_col);
-                if (colit != colvals.end()) {
+                SMatrix::col_map_type::mapped_type::const_iterator colit = (rit->second).find(lhs_col);
+                if (colit != (rit->second).end()) {
                     res_val += lhs.vals_[li] * colit->second;
                 }
             }
@@ -691,10 +691,8 @@ void SMatrix::ridx_update_numCheck(ridx_type::iterator& it, size_type row, size_
 }
 
 void SMatrix::ridx_shift(const size_t& idx, const long int& shift) {
-    std::cout << "error here ridx_shift1" << std::endl;
     for (ridx_type::iterator ridx_it = ridx_.begin(); ridx_it != ridx_.end(); ridx_it++) {
         if ((ridx_it->second).first >= idx) {
-    std::cout << "error here ridx_shift2" << std::endl;
             row_loc_type row_loc = ridx_it->second;
 
             //size_type row = ridx_it->first;
@@ -706,9 +704,7 @@ void SMatrix::ridx_shift(const size_t& idx, const long int& shift) {
             //ridx_.erase(ridx_it);
             //ridx_.insert(std::pair<size_type, row_loc_type>(row, row_loc_type(start + shift, num_elements)));
         }
-    std::cout << "error here ridx_shift3" << std::endl;
     }
-    std::cout << "error here ridx_shift4" << std::endl;
 }
   
 std::string SMatrix::dimString() const {
