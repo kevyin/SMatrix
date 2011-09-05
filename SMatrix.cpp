@@ -323,79 +323,79 @@ bool SMatrix::setVal(size_type i, size_type j, int v) throw(MatrixError) {
 }
 
 
-void SMatrix::addRows(size_type row1, size_type row2) throw(MatrixError) {
-    if (!(row1 < rows_ && row2 < cols_)) 
-        throw boundError(row1, 0, this->dimString());
+//void SMatrix::addRows(size_type row1, size_type row2) throw(MatrixError) {
+    //if (!(row1 < rows_ && row2 < cols_)) 
+        //throw boundError(row1, 0, this->dimString());
     
-    ridx_type::iterator it1 = ridx_.find(row1);
-    ridx_type::iterator it2 = ridx_.find(row2);
+    //ridx_type::iterator it1 = ridx_.find(row1);
+    //ridx_type::iterator it2 = ridx_.find(row2);
 
-    row_loc_type loc1 = it1->second;
-    row_loc_type loc2 = it2->second;
+    //row_loc_type loc1 = it1->second;
+    //row_loc_type loc2 = it2->second;
 
-    size_t start1 = loc1.first;
-    size_t start2 = loc2.first;
-    size_t last1 = start1 + loc1.second - 1;
-    size_t last2 = start2 + loc2.second - 1;
-    assert(start1 <= last1 && start2 <= last2);
+    //size_t start1 = loc1.first;
+    //size_t start2 = loc2.first;
+    //size_t last1 = start1 + loc1.second - 1;
+    //size_t last2 = start2 + loc2.second - 1;
+    //assert(start1 <= last1 && start2 <= last2);
 
-    long int insertCount = 0; // used to update ridx_ later
-    size_t pos1 = last1;
-    size_t pos2 = last2;
-    bool done = false;
-    while (!done) {
-        std::cout << "start1 " << start1 << " start2 " << start2 << std::endl;
-        std::cout << "pos1 " << pos1 << " pos2 " << pos2 << std::endl;
-        const size_t col1 = cidx_[pos1];
-        const size_t col2 = cidx_[pos2];
-        if (col1 == col2) {
-            int res = vals_[pos1] + vals_[pos2];
-            if (res != 0) {
-                vals_[pos1] = res;
-            } else {
-                vals_delVal(pos1);
-                cidx_delVal(pos1);
-                --insertCount;
-            }
-            if (start1 < pos1) --pos1;
-            if (start2 < pos2) --pos2;
-        } else if (col1 < col2) { // zero value in row1
+    //long int insertCount = 0; // used to update ridx_ later
+    //size_t pos1 = last1;
+    //size_t pos2 = last2;
+    //bool done = false;
+    //while (!done) {
+        //std::cout << "start1 " << start1 << " start2 " << start2 << std::endl;
+        //std::cout << "pos1 " << pos1 << " pos2 " << pos2 << std::endl;
+        //const size_t col1 = cidx_[pos1];
+        //const size_t col2 = cidx_[pos2];
+        //if (col1 == col2) {
+            //int res = vals_[pos1] + vals_[pos2];
+            //if (res != 0) {
+                //vals_[pos1] = res;
+            //} else {
+                //vals_delVal(pos1);
+                //cidx_delVal(pos1);
+                //--insertCount;
+            //}
+            //if (start1 < pos1) --pos1;
+            //if (start2 < pos2) --pos2;
+        //} else if (col1 < col2) { // zero value in row1
 
-            vals_setVal(pos1 + 1, true, vals_[pos2]);
-            cidx_setVal(pos1 + 1, true, col2);
-            // since value inserted, row2 may be shifted right
-            if (start1 < start2) { 
-                ++start2; ++last2; ++pos2;
-            }
-            ++insertCount;
-            if (start2 < pos2) --pos2;
-        } else { //(col2 < col1) zero value in row2
-            assert(start1 <= pos1);
-            if (start1 < pos1) { //not the end yet, no need to add since a + 0 = a
-                --pos1;
-            } else if (start1 == pos1) { // reached the end
-                vals_setVal(pos1, true, vals_[pos2]);
-                cidx_setVal(pos1, true, col2);
-                // since value inserted, row2 may be shifted right
-                if (start1 < start2) { 
-                    ++start2; ++last2; ++pos2;
-                }
-                ++insertCount;
-                if (start2 < pos2) --pos2;
-            }
-        }
-    }
-    // update ridx_
-    unsigned int numElem = loc1.second + insertCount;
-    ridx_update_numCheck(it1, row1, start1, numElem);
-    ridx_shift(start1 + 1, insertCount);
-}
+            //vals_setVal(pos1 + 1, true, vals_[pos2]);
+            //cidx_setVal(pos1 + 1, true, col2);
+            //// since value inserted, row2 may be shifted right
+            //if (start1 < start2) { 
+                //++start2; ++last2; ++pos2;
+            //}
+            //++insertCount;
+            //if (start2 < pos2) --pos2;
+        //} else { //(col2 < col1) zero value in row2
+            //assert(start1 <= pos1);
+            //if (start1 < pos1) { //not the end yet, no need to add since a + 0 = a
+                //--pos1;
+            //} else if (start1 == pos1) { // reached the end
+                //vals_setVal(pos1, true, vals_[pos2]);
+                //cidx_setVal(pos1, true, col2);
+                //// since value inserted, row2 may be shifted right
+                //if (start1 < start2) { 
+                    //++start2; ++last2; ++pos2;
+                //}
+                //++insertCount;
+                //if (start2 < pos2) --pos2;
+            //}
+        //}
+    //}
+    //// update ridx_
+    //unsigned int numElem = loc1.second + insertCount;
+    //ridx_update_numCheck(it1, row1, start1, numElem);
+    //ridx_shift(start1 + 1, insertCount);
+//}
 
 //void addCols(size_type, size_type) throw(MatrixError);
 
-void SMatrix::subRows(size_type row1, size_type row2) throw(MatrixError) {
+//void SMatrix::subRows(size_type row1, size_type row2) throw(MatrixError) {
 
-}
+//}
 //void subCols(size_type, size_type) throw(MatrixError);
 //void swapRows(size_type, size_type) throw(MatrixError);
 //void swapCols(size_type, size_type) throw(MatrixError);
@@ -639,7 +639,7 @@ void SMatrix::ridx_update(ridx_type::iterator& it, size_type row, row_loc_type l
 }
 
 void SMatrix::ridx_update_numCheck(ridx_type::iterator& it, size_type row, size_t start, unsigned int numElem) {
-    if (numElem > 1) {
+    if (numElem > 0) {
         ridx_update(it, row, row_loc_type(start, numElem));
     } else {
         ridx_.erase(it);
