@@ -139,9 +139,9 @@ SMatrix operator*(const SMatrix& lhs, const SMatrix& rhs) throw(MatrixError) {
     if (lhs.cols() != rhs.rows()) {
         throw SMatrix::sizeError(lhs.dimString(), rhs.dimString(), "*");
     }
-    SMatrix m(lhs);
-    m *= rhs;
+    SMatrix m(lhs.rows(), rhs.cols());
     return m;
+
 }
 
 SMatrix transpose(const SMatrix& m) {

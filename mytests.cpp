@@ -226,9 +226,9 @@ BOOST_AUTO_TEST_CASE( delVals ) {
   BOOST_CHECK_EQUAL(m.cidx_[1] , 6);
   BOOST_CHECK_EQUAL(m.vals_size_, 2);
   BOOST_CHECK_EQUAL(m.cidx_size_, 2);
-  std::cout << std::endl << m << std::endl;
-  array_print(m.vals_,4);
-  array_print(m.cidx_,4);
+  //std::cout << std::endl << m << std::endl;
+  //array_print(m.vals_,4);
+  //array_print(m.cidx_,4);
 
   m.setVal(2,0,0);
   m.checkIntegrity();
@@ -236,15 +236,15 @@ BOOST_AUTO_TEST_CASE( delVals ) {
   BOOST_CHECK_EQUAL(m.cidx_[0] , 6);
   BOOST_CHECK_EQUAL(m.vals_size_, 1);
   BOOST_CHECK_EQUAL(m.cidx_size_, 1);
-  std::cout << std::endl << m << std::endl;
-  array_print(m.vals_,4);
-  array_print(m.cidx_,4);
+  //std::cout << std::endl << m << std::endl;
+  //array_print(m.vals_,4);
+  //array_print(m.cidx_,4);
 
   m.setVal(2, 0, 3);
   m.setVal(2, 6, 0);
   m.checkIntegrity();
-  array_print(m.vals_,4);
-  array_print(m.cidx_,4);
+  //array_print(m.vals_,4);
+  //array_print(m.cidx_,4);
   BOOST_CHECK_EQUAL(m.vals_[0] , 3);
   BOOST_CHECK_EQUAL(m.cidx_[0] , 0);
   BOOST_CHECK_EQUAL(m.vals_size_, 1);
