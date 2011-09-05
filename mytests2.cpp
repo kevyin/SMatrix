@@ -267,11 +267,34 @@ BOOST_AUTO_TEST_CASE( opmult ) {
   for (SMatrix::size_type i = 0; i < 5; ++i)
     for (SMatrix::size_type j = 0; j < 5; ++j)
       b.setVal(i + 1, j + 1, -1);
+  SMatrix ab = a*b;
 
-  //std::cout << a * b << std::endl;
+  std::cout << a * b << std::endl;
+  a *= b;
+  std::cout << a << std::endl;
+  BOOST_CHECK(a == (ab));
 
     
 }
+
+BOOST_AUTO_TEST_CASE( addsub ) {
+
+  SMatrix a(500000000, 1000000000);
+  for (SMatrix::size_type i = 0; i < 500; ++i)
+    for (SMatrix::size_type j = 0; j < 500; ++j)
+      a.setVal(i + 1000000, j + 1000000, -1);
+
+  SMatrix b(1000000000, 500000000);
+  for (SMatrix::size_type i = 0; i < 500; ++i)
+    for (SMatrix::size_type j = 0; j < 500; ++j)
+      b.setVal(i + 1000000, j + 1000000, -1);
+    std::cout << "ADd sub" << std::endl;
+
+   SMatrix abadd = a + a;
+   //SMatrix abmin = a - a;
+
+}
+    
 
 //BOOST_AUTO_TEST_CASE( addrows) {
     //SMatrix m(2,3);

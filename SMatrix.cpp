@@ -32,9 +32,10 @@ void array_remove(T*& array, const size_t& array_len,  const size_t& pos) {
 template <typename T>
 void array_copy(T* const& array1, const size_t& array1_len, T*& array2, size_t& array2_len) {
     assert(array1_len <= array2_len);
-    for (size_t i = 0; i < array1_len; i++) {
-        array2[i] = array1[i];
-    }
+    //for (size_t i = 0; i < array1_len; i++) {
+        //array2[i] = array1[i];
+    //}
+    std::copy(&array1[0], &array1[array1_len], array2);
 }
 
 template <typename T>
@@ -125,7 +126,7 @@ bool operator==(const SMatrix& l, const SMatrix& r) {
 bool operator!=(const SMatrix& l, const SMatrix& r) {
     return !(l == r);
 }
-
+//@todo
 SMatrix operator+(const SMatrix& lhs, const SMatrix& rhs) throw(MatrixError) {
     if (lhs.rows() != rhs.rows() || lhs.cols() != rhs.cols()) {
         throw SMatrix::sizeError(lhs.dimString(), rhs.dimString(), "+");
@@ -134,6 +135,7 @@ SMatrix operator+(const SMatrix& lhs, const SMatrix& rhs) throw(MatrixError) {
     m += rhs;
     return m;
 }
+//@todo
 SMatrix operator-(const SMatrix& lhs, const SMatrix& rhs) throw(MatrixError) {
     if (lhs.rows() != rhs.rows() || lhs.cols() != rhs.cols()) {
         throw SMatrix::sizeError(lhs.dimString(), rhs.dimString(), "-");
@@ -148,7 +150,6 @@ SMatrix operator*(const SMatrix& lhs, const SMatrix& rhs) throw(MatrixError) {
         throw SMatrix::sizeError(lhs.dimString(), rhs.dimString(), "*");
     }
     SMatrix res(lhs.rows(), rhs.cols());
-
 
     // a memory of columns built from rhs
     SMatrix::col_map_type colMap; 
@@ -189,6 +190,7 @@ SMatrix operator*(const SMatrix& lhs, const SMatrix& rhs) throw(MatrixError) {
 
 }
 
+// @todo
 SMatrix transpose(const SMatrix& m) {
     SMatrix tm(m.cols(), m.rows());
 
@@ -267,23 +269,27 @@ SMatrix& SMatrix::operator=(const SMatrix& rhs) {
     return *this;
 }
 
-SMatrix& SMatrix::operator+=(const SMatrix& rhs) throw(MatrixError) {
-    if (this->rows() != rhs.rows() || this->cols() != rhs.cols()) {
-        throw sizeError(this->dimString(), rhs.dimString(), "+=");
+SMatrix& SMatrix::operator+=(const SMatrix& r) throw(MatrixError) {
+    if (this->rows() != r.rows() || this->cols() != r.cols()) {
+        throw sizeError(this->dimString(), r.dimString(), "+=");
     }
 
-    //std::cout << "plus" << std::endl;
-    for (size_type i = 0; i < rows_; ++i) {
-        for (size_type j = 0; j < cols_; ++j) {
-            //std::cout << "i " << i << "j " << j << std::endl;
-            
-            int thisVal = (*this)(i,j);
-            int res = thisVal + rhs(i,j);
-            if (thisVal != res) (*this).setVal(i,j,res);
-        }
-    }
+    //SMatrix& l= *this;
+    //// by row
+    //for (SMatrix::ridx_type::const_iterator lit = l.ridx_.begin(), rit = r.ridx_.begin();
+         //lit != l.ridx_.end() && rit != r.ridx_.end();
+         //++lit, ++rit) {
+
+        //SMatrix::row_loc_type lloc = lit->second;
+        //SMatrix::row_loc_type rloc = rit->second;
+
+        //pair<list<int>, list<unsigned int> > res = sumRow(l, lloc, r, rloc, true);
+        //l.replaceRow(lit->first, res);
+
+    //}
     return *this;
 }
+
 SMatrix& SMatrix::operator-=(const SMatrix& rhs) throw(MatrixError) {
     if (this->rows() != rhs.rows() || this->cols() != rhs.cols()) {
         throw sizeError(this->dimString(), rhs.dimString(), "-=");
@@ -302,17 +308,7 @@ SMatrix& SMatrix::operator*=(const SMatrix& rhs) throw(MatrixError) {
     if (this->cols() != rhs.rows()) {
         throw sizeError(this->dimString(), rhs.dimString(), "*=");
     }
-
-    for (size_type i = 0; i < rows_; ++i) {
-        for (size_type j = 0; j < cols_; ++j) {
-            int thisVal = (*this)(i,j);
-            int res = 0;
-            for (size_type k = 0; k < cols_; ++k) {
-                res += (*this)(i,k) * rhs(k,j);
-            }
-            if (thisVal != res) (*this).setVal(i,j,res);
-        }
-    }
+    *this = *this * rhs;
     return *this;    
 }
 
@@ -368,6 +364,7 @@ bool SMatrix::setVal(size_type i, size_type j, int v) throw(MatrixError) {
 }
 
 
+//@todo
 //void SMatrix::addRows(size_type row1, size_type row2) throw(MatrixError) {
     //if (!(row1 < rows_ && row2 < cols_)) 
         //throw boundError(row1, 0, this->dimString());
@@ -471,6 +468,7 @@ SMatrix::~SMatrix() {
 }
 
 // static members  
+//@todo
 //SMatrix SMatrix::identity(size_type);
 
 // private functions
