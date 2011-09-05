@@ -38,6 +38,13 @@ void array_copy(T* const& array1, const size_t& array1_len, T*& array2, size_t& 
 }
 
 template <typename T>
+size_t array_find(T* const& array, const size_t& first, const size_t& last, T& val) {
+    size_t i = first;
+    while (array[i] < val && i <= last) ++i;
+    return i;
+}
+
+template <typename T>
 void array_print(T*& array, const size_t array_len) {
     for (size_t k = 0; k < array_len; k++) {
         std::cout << array[k] << ' ';
@@ -139,8 +146,23 @@ SMatrix operator*(const SMatrix& lhs, const SMatrix& rhs) throw(MatrixError) {
     if (lhs.cols() != rhs.rows()) {
         throw SMatrix::sizeError(lhs.dimString(), rhs.dimString(), "*");
     }
-    SMatrix m(lhs.rows(), rhs.cols());
-    return m;
+    SMatrix res(lhs.rows(), rhs.cols());
+
+    // a memory of columns built from rhs
+    // build all cols in rhs
+    SMatrix::col_map_type colMap; 
+    //rhs.buildCols(colMap, SMatrix::size_type(0), rhs.cols() - 1);
+
+    //for (SMatrix::ridx_type::const_iterator it = lhs.ridx_.begin();
+         //it != lhs.ridx_.end(); ++it) {
+        //size_type row = it->first;
+        //SMatrix::row_loc_type loc = it->second;
+        //size_t start = loc.first;
+        //size_t last = start + loc.second - 1;
+
+    //}
+
+    return res;
 
 }
 
@@ -151,7 +173,7 @@ SMatrix transpose(const SMatrix& m) {
     for (SMatrix::ridx_type::const_iterator it = m.ridx_.begin();
          it != m.ridx_.end(); ++it) {
 
-        size_t row = it->first;
+        SMatrix::size_type row = it->first;
 
         SMatrix::row_loc_type loc = it->second;
         size_t start = loc.first;
@@ -635,7 +657,7 @@ void SMatrix::cidx_delVal(const size_t& pos) {
 
 void SMatrix::ridx_update(ridx_type::iterator& it, size_type row, row_loc_type loc) {
     ridx_.erase(it);
-    ridx_.insert(std::pair<size_type, row_loc_type>(row, loc));
+    ridx_.insert(ridx_type::value_type(row, loc));
 }
 
 void SMatrix::ridx_update_numCheck(ridx_type::iterator& it, size_type row, size_t start, unsigned int numElem) {
@@ -667,6 +689,37 @@ std::string SMatrix::dimString() const {
     ss << this->rows() << " x " << this->cols();
 
     return ss.str();
+}
+
+// rows and cols
+void SMatrix::buildCols(col_map_type& map, size_type& firstCol, size_type& lastCol) const {
+    assert(firstCol <= lastCol);
+
+    for (SMatrix::ridx_type::const_iterator it = ridx_.begin(); it != ridx_.end(); ++it) {
+        size_type row = it->first;
+        SMatrix::row_loc_type loc = it->second;
+        size_t start = loc.first;
+        size_t last = start + loc.second - 1;
+
+        for (size_t i = start; i <= last; ++i) {
+            size_type col = cidx_[i];
+            if (firstCol <= col && col <= lastCol) {
+                int val = vals_[i];
+
+                // find col in map and update
+                col_map_type::iterator itCol = map.find(col);
+                if (itCol != map.end()) {
+                    (itCol->second).insert(std::make_pair<size_type, int>(row, val));
+                } else {
+                    row_map_type tmp_map;
+                    tmp_map.insert(std::make_pair<size_type, int>(row, val));
+                    map.insert(col_map_type::value_type(col, tmp_map));    
+                }
+            }
+        }
+
+    }
+
 }
 
 MatrixError SMatrix::sizeError(const std::string l, const std::string r, const std::string op) {

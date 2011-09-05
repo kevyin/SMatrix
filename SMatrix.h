@@ -89,6 +89,9 @@ class SMatrix {
   typedef std::map< size_type, row_loc_type > ridx_type;
   typedef std::pair<size_t, bool> insert_pos_type; // (pos, true=insert false=overwrite)
 
+  // map(col_idx, map(row_idx, val))
+  typedef std::map< size_type, int> row_map_type;
+  typedef std::map< size_type, row_map_type> col_map_type;
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // private data members
@@ -141,6 +144,12 @@ class SMatrix {
   void ridx_update_numCheck(ridx_type::iterator&, size_type, size_t, unsigned int);
 
   std::string dimString() const;
+
+  // rows and cols
+  /*
+   * Build a map of cols from first to last inclusive
+   */
+  void buildCols(col_map_type&, size_type&, size_type&) const;
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // private static members
