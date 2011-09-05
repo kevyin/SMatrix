@@ -38,14 +38,15 @@ void array_copy(T* const& array1, const size_t& array1_len, T*& array2, size_t& 
 }
 
 template <typename T>
-size_t array_find(T* const& array, const size_t& first, const size_t& last, T& val) {
+size_t array_find(const T* const& array, const size_t& first, const size_t& last, const T& val) {
     size_t i = first;
     while (array[i] < val && i <= last) ++i;
     return i;
 }
 
+
 template <typename T>
-void array_print(T*& array, const size_t array_len) {
+void array_print(const T* const& array, const size_t array_len) {
     for (size_t k = 0; k < array_len; k++) {
         std::cout << array[k] << ' ';
     }
@@ -306,9 +307,9 @@ int SMatrix::operator()(size_type row, size_type col) const throw(MatrixError) {
         size_t last = start + num_elements - 1;
 
         // find the position
-        size_t i = start;
-        // @todo binary search
-        while (cidx_[i] < col && i <= last) ++i;
+        //size_t i = start;
+        //while (cidx_[i] < col && i <= last) ++i;
+        size_t i = array_find<size_type>(cidx_, start, last, col);
         if (cidx_[i] == col) {
             return vals_[i];
         } else {
@@ -541,9 +542,9 @@ SMatrix::insert_pos_type SMatrix::idx_setVal(const size_type& row, const size_ty
         size_t last = start + num_elements - 1;
 
         // find the position to modify/insert
-        size_t i = start;
-        //@todo binary search
-        while (cidx_[i] < col && i <= last) ++i;
+        //size_t i = start;
+        //while (cidx_[i] < col && i <= last) ++i;
+        size_t i = array_find<size_type>(cidx_, start, last, col);
 
         if (i <= last && cidx_[i] == col) { // overwrite old value
             return insert_pos_type(i, false);
@@ -610,9 +611,9 @@ bool SMatrix::delVal(const size_type& row, const size_type& col) {
 //#endif
 
         // find the position to delete
-        size_t i = start;
-        // todo Binary search
-        while (cidx_[i] < col && i <= last) ++i;
+        //size_t i = start;
+        //while (cidx_[i] < col && i <= last) ++i;
+        size_t i = array_find<size_type>(cidx_, start, last, col);
 
 //#ifdef TEST
     //std::cout << "i " << i << std::endl;
@@ -701,7 +702,7 @@ void SMatrix::buildCols(col_map_type& map, size_type& firstCol, size_type& lastC
         size_t start = loc.first;
         size_t last = start + loc.second - 1;
 
-        for (size_t i = start; i <= last; ++i) {
+        for (size_t i = array_find<size_type>(cidx_, start, last, firstCol); i <= last; ++i) {
             size_type col = cidx_[i];
             if (firstCol <= col && col <= lastCol) {
                 int val = vals_[i];
