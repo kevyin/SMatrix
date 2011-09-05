@@ -149,7 +149,7 @@ class SMatrix {
   /*
    * Build a map of cols from first to last inclusive
    */
-  void buildCols(col_map_type&, size_type&, size_type&) const;
+  void buildCols(col_map_type&, size_type, size_type) const;
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // private static members

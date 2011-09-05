@@ -120,11 +120,14 @@ BOOST_AUTO_TEST_CASE( opEquality ) {
     BOOST_CHECK(!(m == m2));
 
 
+    std::cout << "error here" << std::endl;
     m.setVal(2, 8, 5);
+    std::cout << "error here2" << std::endl;
     m.checkIntegrity();
     BOOST_CHECK(m == m2);
     BOOST_CHECK(m2 == m);
 
+    std::cout << "error here" << std::endl;
     m.setVal(2, 8, 3);
     m.checkIntegrity();
     BOOST_CHECK(!(m == m2));
@@ -202,7 +205,7 @@ BOOST_AUTO_TEST_CASE( opaddsub ) {
 BOOST_AUTO_TEST_CASE( opmult ) {
     cout << "operator*" << endl;
 
-    SMatrix m(2,3);
+    SMatrix m(3,3);
     m.checkIntegrity();
     m.setVal(0, 2, 5);
     m.checkIntegrity();
@@ -231,6 +234,26 @@ BOOST_AUTO_TEST_CASE( opmult ) {
           std::cout << "Test failed!" << std::endl;
         }
       } catch (...) { }
+
+    SMatrix m2 = m * m;
+
+    SMatrix::col_map_type colMap; 
+    m.buildCols(colMap, SMatrix::size_type(0), m.cols() - 1);
+
+    std::cout << "finnished build" << std::endl;
+    for (SMatrix::col_map_type::const_iterator it = colMap.begin();
+         it != colMap.end(); ++it) {
+        SMatrix::size_type col = it->first;
+        std::cout << "col " << col << std::endl;
+         SMatrix::col_map_type::mapped_type colvals = it->second;
+
+        for (SMatrix::col_map_type::mapped_type::const_iterator it2 = colvals.begin();
+             it2 != colvals.end(); ++it2) {
+            std::cout << "row " << it2->first << " val " << it2->second << std::endl;
+            
+            BOOST_CHECK_EQUAL(it2->second, m(it2->first,col));
+        }
+    }
 
     //SMatrix m2(3,2);
     //m2.setVal(0, 1, 1);

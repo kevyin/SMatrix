@@ -13,7 +13,7 @@ CPPFLAGS = -Wall -Werror -O2
 # enable this line for debugging
 # CPPFLAGS = -Wall -g
 
-default: test0 test1 test2 test3 mytest0
+default: test0 test1 test2 test3 mytest0 mytests mytests2
 
 test0: SMatrix.h SMatrix.cpp test0.cpp
 	$(CXX) $(CPPFLAGS) -o test0 SMatrix.cpp test0.cpp
