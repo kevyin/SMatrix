@@ -10,6 +10,7 @@
 #include <map>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include <cstddef>
 
@@ -92,7 +93,8 @@ class SMatrix {
   // map(col_idx, map(row_idx, val))
   typedef std::map< size_type, int> row_map_type;
   typedef std::map< size_type, row_map_type> col_map_type;
-
+  
+  typedef std::pair<std::vector<int>, std::vector<SMatrix::size_type> > row_vector_type;
   ///////////////////////////////////////////////////////////////////////////////////////
   // private data members
   int *vals_;
@@ -150,6 +152,7 @@ class SMatrix {
    * Build a map of cols from first to last inclusive
    */
   void buildCols(col_map_type&, size_type, size_type) const;
+  void replaceRow(size_type row, row_vector_type newRow);
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // private static members

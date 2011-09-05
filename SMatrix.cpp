@@ -4,9 +4,8 @@
 #include <algorithm>
 #include <assert.h>
 
-//#include <string>
-// @TODO delete after
 #include <sstream>
+
 
 // Your fantastic implementation goes here!
 // You should test it extensively to ensure that it behaves exactly 
@@ -274,19 +273,32 @@ SMatrix& SMatrix::operator+=(const SMatrix& r) throw(MatrixError) {
         throw sizeError(this->dimString(), r.dimString(), "+=");
     }
 
-    //SMatrix& l= *this;
-    //// by row
-    //for (SMatrix::ridx_type::const_iterator lit = l.ridx_.begin(), rit = r.ridx_.begin();
-         //lit != l.ridx_.end() && rit != r.ridx_.end();
-         //++lit, ++rit) {
-
-        //SMatrix::row_loc_type lloc = lit->second;
-        //SMatrix::row_loc_type rloc = rit->second;
-
-        //pair<list<int>, list<unsigned int> > res = sumRow(l, lloc, r, rloc, true);
-        //l.replaceRow(lit->first, res);
-
+    SMatrix& l= *this;
+    // prepare row for appending
+    // make copy of original row
+    // delete row
+    // insert resulting row
+    // update ridx
+    
+    //while (!isEnd) {
+        //if (cidx1[i1] == cidx2[i2]) {
+            //res_vals.push_back(vals1[i1] + vals2[i2]);
+            //res_cidx.push_back(cidx1[i1]);
+            //if (i1 < loc1.second - 1) ++i1;
+            //if (i2 < loc2.second - 1) ++i2;
+        //} else if (cidx1[i1] < cidx2[i2]) {
+            //res_vals.push_back(vals1[i1]);
+            //res_cidx.push_back(cidx1[i1]);
+            //if (i1 < loc1.second - 1) ++i1;
+        //} else {
+            //res_vals.push_back(vals2[i2]);
+            //res_cidx.push_back(cidx2[i2]);
+            //if (i2 < loc2.second - 1) ++i2;
+        //}
+        //if (i1 == loc1.second && i2 == loc2.second) isEnd = true;
     //}
+    
+
     return *this;
 }
 
@@ -742,6 +754,7 @@ void SMatrix::buildCols(col_map_type& map, size_type firstCol, size_type lastCol
     }
 
 }
+
 
 MatrixError SMatrix::sizeError(const std::string l, const std::string r, const std::string op) {
     std::stringstream ss;
