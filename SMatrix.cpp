@@ -183,31 +183,33 @@ SMatrix operator*(const SMatrix& lhs, const SMatrix& rhs) throw(MatrixError) {
         }
 
     }
-
     return res;
 
 }
 
-// @todo
 SMatrix transpose(const SMatrix& m) {
-    SMatrix tm(m.cols(), m.rows());
+    // a memory of columns built from m
+    SMatrix::col_map_type colMap; 
+    // build all cols in rhs
+    m.buildColsMap(colMap, SMatrix::size_type(0), m.cols() - 1);
 
-    // iterate through each row of m
-    for (SMatrix::ridx_type::const_iterator it = m.ridx_.begin();
-         it != m.ridx_.end(); ++it) {
+    SMatrix res(m.cols(), m.rows());
 
-        SMatrix::size_type row = it->first;
+    for (SMatrix::col_map_type::const_iterator col_it = colMap.begin(); 
+         col_it != colMap.end(); ++col_it) {
 
-        SMatrix::row_loc_type loc = it->second;
-        size_t start = loc.first;
-        size_t last = start + loc.second - 1;
+        SMatrix::size_type col = col_it->first;
+        SMatrix::row_map_type rowMap = col_it->second;
+        
+        for (SMatrix::row_map_type::const_iterator row_it = rowMap.begin();
+             row_it != rowMap.end(); ++row_it) {
 
-        for (size_t k = start; k <= last; ++k) {
-            size_t col = m.cidx_[k];
-            tm.setVal(col,row,m.vals_[k]);
+            SMatrix::size_type row = row_it->first;
+            int val = row_it->second;
+            res.setVal(col,row,val);
         }
     }
-    return tm;
+    return res;
 }
 
 std::ostream& operator<<(std::ostream &os, const SMatrix &m) {
@@ -423,7 +425,7 @@ bool SMatrix::setVal(size_type i, size_type j, int v) throw(MatrixError) {
     if (v != 0) {
         // allocate more memory if necesary
         checkIntegrity();
-        if (vals_size_ == vals_capacity_) {
+        if (vals_size_ >= vals_capacity_) {
             memAlloc = this->array_expand();
         }
         // update the internal representation
@@ -439,20 +441,103 @@ bool SMatrix::setVal(size_type i, size_type j, int v) throw(MatrixError) {
 }
 
 
-//void SMatrix::addRows(size_type row1, size_type row2) throw(MatrixError) {
+void SMatrix::addRows(size_type row1, size_type row2) throw(MatrixError) {
+    if (!(row1 < rows()))  
+        throw boundError(row1, 0, this->dimString());
+    if (!(row2 < rows()))  
+        throw boundError(row2, 0, this->dimString());
     
-//}
+    ridx_type::const_iterator r1_it = ridx_.find(row1);   
+    ridx_type::const_iterator r2_it = ridx_.find(row2);   
+    if (r1_it != ridx_.end() && r2_it != ridx_.end()) { // both rows contain values
+        SMatrix tmp_res = sumRow(*this, r1_it->second, *this, r2_it->second, 1);
+        insertRow(tmp_res, 0, row1, 1);
+    } else if (r1_it == ridx_.end() && r2_it != ridx_.end()) { // row1 is zero row2 is not
+        SMatrix tmp_res(1,cols());
+        tmp_res.insertRow(*this, row2, 0, 1);
+        insertRow(tmp_res, 0, row1, 1);
+    } // otherwise no need to do work
+        
+}
 
-//void addCols(size_type, size_type) throw(MatrixError);
+void SMatrix::addCols(size_type col1, size_type col2) throw(MatrixError) {
+    if (!(col1 < cols()))  
+        throw boundError(col1, 0, this->dimString());
+    if (!(col2 < cols()))  
+        throw boundError(col2, 0, this->dimString());
 
-//void SMatrix::subRows(size_type row1, size_type row2) throw(MatrixError) {
+    SMatrix tmp = transpose(*this);
+    tmp.addRows(col1,col2);
 
-//}
-//void subCols(size_type, size_type) throw(MatrixError);
-//void swapRows(size_type, size_type) throw(MatrixError);
-//void swapCols(size_type, size_type) throw(MatrixError);
+    delete [] this->vals_;
+    delete [] this->cidx_;
+    this->copy(transpose(tmp));
+}
 
-//// `iterator' operations
+void SMatrix::subRows(size_type row1, size_type row2) throw(MatrixError) {
+    if (!(row1 < rows()))  
+        throw boundError(row1, 0, this->dimString());
+    if (!(row2 < rows()))  
+        throw boundError(row2, 0, this->dimString());
+    
+    ridx_type::const_iterator r1_it = ridx_.find(row1);   
+    ridx_type::const_iterator r2_it = ridx_.find(row2);   
+    if (r1_it != ridx_.end() && r2_it != ridx_.end()) { // both rows contain values
+        SMatrix tmp_res = sumRow(*this, r1_it->second, *this, r2_it->second, -1);
+        insertRow(tmp_res, 0, row1, 1);
+    } else if (r1_it == ridx_.end() && r2_it != ridx_.end()) { // row1 is zero row2 is not
+        SMatrix tmp_res(1,cols());
+        tmp_res.insertRow(*this, row2, 0, 1);
+        insertRow(tmp_res, 0, row1, -1);
+    } // otherwise no need to do work
+        
+}
+
+void SMatrix::subCols(size_type col1, size_type col2) throw(MatrixError) {
+    if (!(col1 < cols()))  
+        throw boundError(col1, 0, this->dimString());
+    if (!(col2 < cols()))  
+        throw boundError(col2, 0, this->dimString());
+
+    SMatrix tmp = transpose(*this);
+    tmp.subRows(col1,col2);
+
+    delete [] this->vals_;
+    delete [] this->cidx_;
+    this->copy(transpose(tmp));
+}
+
+void SMatrix::swapRows(size_type row1, size_type row2) throw(MatrixError) {
+    if (!(row1 < rows()))  
+        throw boundError(row1, 0, this->dimString());
+    if (!(row2 < rows()))  
+        throw boundError(row2, 0, this->dimString());
+   
+    SMatrix tmp_row1(1,cols());
+    tmp_row1.insertRow(*this, row1, 0, 1);
+
+    SMatrix tmp_row2(1,cols());
+    tmp_row2.insertRow(*this, row2, 0, 1);
+
+    insertRow(tmp_row2, 0, row1, 1);
+    insertRow(tmp_row1, 0, row2, 1);
+}
+
+void SMatrix::swapCols(size_type col1, size_type col2) throw(MatrixError) {
+    if (!(col1 < cols()))  
+        throw boundError(col1, 0, this->dimString());
+    if (!(col2 < cols()))  
+        throw boundError(col2, 0, this->dimString());
+
+    SMatrix tmp = transpose(*this);
+    tmp.swapRows(col1,col2);
+
+    delete [] this->vals_;
+    delete [] this->cidx_;
+    this->copy(transpose(tmp));
+}
+
+// `iterator' operations
 void SMatrix::begin() const {
     iter_pos = 0;
 }

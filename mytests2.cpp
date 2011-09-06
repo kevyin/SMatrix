@@ -366,23 +366,80 @@ BOOST_AUTO_TEST_CASE( insertRows ) {
 
 
 }
-//BOOST_AUTO_TEST_CASE( addrows) {
-    //SMatrix m(2,3);
-    //m.checkIntegrity();
-    //m.setVal(0, 2, 5);
-    //m.checkIntegrity();
-    //m.setVal(1, 1, 3);
-    //m.checkIntegrity();
+BOOST_AUTO_TEST_CASE( addrows) {
+    std::cout << "addrows" << std::endl;
+    SMatrix m(2,3);
+    m.checkIntegrity();
+    m.setVal(0, 2, 5);
+    m.checkIntegrity();
+    m.setVal(1, 1, 3);
+    m.checkIntegrity();
 
-    //m.setVal(0, 0, 7);
-    //m.checkIntegrity();
-    //m.setVal(1, 2, 7);
-    //m.checkIntegrity();
-    //m.setVal(0, 1, 8);
-    //m.checkIntegrity();
+    m.setVal(0, 0, 7);
+    m.checkIntegrity();
+    m.setVal(1, 2, 7);
+    m.checkIntegrity();
+    m.setVal(0, 1, 8);
+    m.checkIntegrity();
 
-    //m.addRows(0,1);
-    //BOOST_CHECK_EQUAL(m(0,0), 7);
-    //BOOST_CHECK_EQUAL(m(0,1), 11);
-    //BOOST_CHECK_EQUAL(m(0,2), 12);
-//}
+    m.addRows(0,1);
+    BOOST_CHECK_EQUAL(m(0,0), 7);
+    BOOST_CHECK_EQUAL(m(0,1), 11);
+    BOOST_CHECK_EQUAL(m(0,2), 12);
+}
+
+BOOST_AUTO_TEST_CASE( transp) {
+  std::cout << "transpose" << std::endl;
+    SMatrix m(2,3);
+    m.checkIntegrity();
+    m.setVal(0, 2, 5);
+    m.checkIntegrity();
+    m.setVal(1, 1, 3);
+    m.checkIntegrity();
+
+    m.setVal(0, 0, 7);
+    m.checkIntegrity();
+    m.setVal(1, 2, 7);
+    m.checkIntegrity();
+    m.setVal(0, 1, 8);
+    m.checkIntegrity();
+  std::cout << m << std::endl;
+  SMatrix m2 = transpose(m);
+  std::cout << m2 << std::endl;
+
+  for (int i = 0; i < 2; i++)
+    for (int j = 0; j < 3; j++)
+        BOOST_CHECK_EQUAL(m(i,j),m2(j,i));
+
+}
+
+BOOST_AUTO_TEST_CASE( coluafwefawefs) {
+  std::cout << "column funcs" << std::endl;
+    SMatrix m(2,3);
+    m.checkIntegrity();
+    m.setVal(0, 2, 5);
+    m.checkIntegrity();
+    m.setVal(1, 1, 3);
+    m.checkIntegrity();
+
+    m.setVal(0, 0, 7);
+    m.checkIntegrity();
+    m.setVal(1, 2, 7);
+    m.checkIntegrity();
+    m.setVal(0, 1, 8);
+    m.checkIntegrity();
+  std::cout << "m" << std::endl;
+  prettyMatrix(m);
+  m.addCols(0,1);
+  std::cout << "added" << std::endl;
+  prettyMatrix(m);
+
+  std::cout << "swap" << std::endl;
+  m.swapCols(0,1);
+  prettyMatrix(m);
+
+
+  m.subCols(0,2);
+  prettyMatrix(m);
+
+}
