@@ -200,10 +200,10 @@ BOOST_AUTO_TEST_CASE( opaddsub ) {
     BOOST_CHECK(m2 == m);
     
     SMatrix m3 = m + m0 + m1 + m2;
-    //BOOST_CHECK((m3 - m - m1) == m);
-    //m3 -= m;
-    //m3 -= m;
-    //BOOST_CHECK((m3) == m);
+    BOOST_CHECK((m3 - m - m1) == m);
+    m3 -= m;
+    m3 -= m;
+    BOOST_CHECK((m3) == m);
 
   //SMatrix a(500000000, 1000000000);
   //for (SMatrix::size_type i = 0; i < 500; ++i)
@@ -295,7 +295,7 @@ BOOST_AUTO_TEST_CASE( opmult ) {
 
     
 }
-/*
+
 BOOST_AUTO_TEST_CASE( sumrow ) {
   SMatrix a(10, 10);
   for (SMatrix::size_type i = 0; i < 5; ++i)
@@ -321,19 +321,18 @@ BOOST_AUTO_TEST_CASE( sumrow ) {
   std::cout << "b" << std::endl;
   prettyMatrix(b);
   
-  SMatrix res_tmp = SMatrix::sumRow(a, a.ridx_.find(1)->second, b, b.ridx_.find(1)->second);
+  SMatrix res_tmp = SMatrix::sumRow(a, a.ridx_.find(1)->second, b, b.ridx_.find(1)->second, 1);
   std::cout << "ress" << std::endl;
   prettyMatrix(res_tmp);
-  SMatrix res_tmp0 = SMatrix::sumRow(a, a.ridx_.find(0)->second, b, b.ridx_.find(0)->second);
+  SMatrix res_tmp0 = SMatrix::sumRow(a, a.ridx_.find(0)->second, b, b.ridx_.find(0)->second, 1);
   std::cout << "ress0" << std::endl;
   prettyMatrix(res_tmp0);
-  SMatrix res_tmp9 = SMatrix::sumRow(a, a.ridx_.find(9)->second, b, b.ridx_.find(9)->second);
+  SMatrix res_tmp9 = SMatrix::sumRow(a, a.ridx_.find(9)->second, b, b.ridx_.find(9)->second, 1);
   std::cout << "ress9" << std::endl;
   prettyMatrix(res_tmp9);
   
 
 }
-*/
 
 BOOST_AUTO_TEST_CASE( insertRows ) {
     std::cout << " ===================insertrows" << std::endl;
@@ -383,7 +382,7 @@ BOOST_AUTO_TEST_CASE( insertRows ) {
     //m.checkIntegrity();
 
     //m.addRows(0,1);
-    ////BOOST_CHECK_EQUAL(m(0,0), 7);
-    ////BOOST_CHECK_EQUAL(m(0,1), 11);
-    ////BOOST_CHECK_EQUAL(m(0,2), 12);
+    //BOOST_CHECK_EQUAL(m(0,0), 7);
+    //BOOST_CHECK_EQUAL(m(0,1), 11);
+    //BOOST_CHECK_EQUAL(m(0,2), 12);
 //}
