@@ -10,7 +10,6 @@
 #include <map>
 #include <string>
 #include <utility>
-#include <vector>
 
 #include <cstddef>
 
@@ -94,7 +93,6 @@ class SMatrix {
   typedef std::map< size_type, int> row_map_type;
   typedef std::map< size_type, row_map_type> col_map_type;
   
-  typedef std::pair<std::vector<int>, std::vector<SMatrix::size_type> > row_vector_type;
   ///////////////////////////////////////////////////////////////////////////////////////
   // private data members
   int *vals_;
@@ -135,7 +133,9 @@ class SMatrix {
 
   bool delVal(const size_type&, const size_type&);
   void vals_delVal(const size_t&);
+  void vals_delVals(const size_t& pos, const size_t& num); 
   void cidx_delVal(const size_t&);
+  void cidx_delVals(const size_t& pos, const size_t& num); 
 
   // ridx_ methods
   /*
@@ -151,8 +151,11 @@ class SMatrix {
   /*
    * Build a map of cols from first to last inclusive
    */
-  void buildCols(col_map_type&, size_type, size_type) const;
-  void replaceRow(size_type row, row_vector_type newRow);
+  void buildColsMap(col_map_type&, size_type, size_type) const;
+  static SMatrix sumRow(const SMatrix&, const row_loc_type, const SMatrix&, const row_loc_type);
+  void insertRow(const SMatrix& fromM, const row_loc_type& loc, const size_type& toRow);
+  void insertRow(const SMatrix& fromM, const size_type& fromRow, const size_type& toRow);
+  void clearRow(const size_type& row);
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // private static members
