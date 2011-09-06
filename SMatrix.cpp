@@ -285,37 +285,42 @@ SMatrix& SMatrix::operator+=(const SMatrix& rhs) throw(MatrixError) {
     SMatrix::size_type rrow = rridx_it->first;
     while (!isEnd) {
         // update lrow and rrow
-        if (lridx_it != lhs.ridx_.end()) 
+        if (lridx_it != lhs.ridx_.end()) {
             lrow = lridx_it->first;
-        else
+        } else {
             lrow = maxRows; // set to past last row
-        if (rridx_it != lhs.ridx_.end()) 
+        }
+        if (rridx_it != rhs.ridx_.end()) {
             rrow = rridx_it->first;
-        else
+        } else {
             rrow = maxRows; // set to past last row
+        }
 
-        //if (lrow == rrow) {
-            //// compute sum of row
-            //SMatrix res_tmp = sumRow(lhs, lridx_it->second, rhs, rridx_it->second);
-            //// insert new row to res
-            //res.insertRow(res_tmp, 0); // insert from row 0 of result
-            //if (lridx_it != lhs.ridx_.end()) ++lridx_it;
-            //if (rridx_it != lhs.ridx_.end()) ++rridx_it;
-        //} else if (lrow < rrow) {
-            //// insert lrow to res
-            //res.insertRow(lhs, lridx_it->second);
-            //if (lridx_it != lhs.ridx_.end()) ++lridx_it;
-        //} else {
-            //// insert rrow to res
-            //res.insertRow(rhs, rridx_it->second);
-            //if (rridx_it != lhs.ridx_.end()) ++rridx_it;
-        //}
+        if (lrow == rrow) {
+            // compute sum of row
+            SMatrix res_tmp = sumRow(lhs, lridx_it->second, rhs, rridx_it->second, 1);
+            // insert new row to res
+            res.insertRow(res_tmp, 0, lrow, 1); // insert from row 0 of result
+            if (lridx_it != lhs.ridx_.end()) ++lridx_it;
+            if (rridx_it != lhs.ridx_.end()) ++rridx_it;
+        } else if (lrow < rrow) {
+            // insert lrow to res
+            res.insertRow(lhs, lridx_it->second, lrow, 1);
+            if (lridx_it != lhs.ridx_.end()) ++lridx_it;
+        } else {
+            // insert rrow to res
+            res.insertRow(rhs, rridx_it->second, rrow, 1);
+            if (rridx_it != lhs.ridx_.end()) ++rridx_it;
+        }
 
-        if (lridx_it == lhs.ridx_.end() && rridx_it == lhs.ridx_.end()) 
+        if (lridx_it == lhs.ridx_.end() && rridx_it == rhs.ridx_.end()) 
             isEnd = true;
     }
     
 
+    delete [] vals_;
+    delete [] cidx_;
+    copy(res);
     return *this;
 }
 
@@ -324,13 +329,53 @@ SMatrix& SMatrix::operator-=(const SMatrix& rhs) throw(MatrixError) {
         throw sizeError(this->dimString(), rhs.dimString(), "-=");
     }
 
-    for (size_type i = 0; i < rows_; ++i) {
-        for (size_type j = 0; j < cols_; ++j) {
-            int thisVal = (*this)(i,j);
-            int res = thisVal - rhs(i,j);
-            if (thisVal != res) (*this).setVal(i,j,res);
+    SMatrix res(rhs.rows(),rhs.cols());
+    SMatrix& lhs= *this;
+    SMatrix::size_type maxRows = res.rows();
+    
+    bool isEnd = false;
+    SMatrix::ridx_type::const_iterator lridx_it = lhs.ridx_.begin();
+    SMatrix::ridx_type::const_iterator rridx_it = rhs.ridx_.begin();
+    SMatrix::size_type lrow = lridx_it->first;
+    SMatrix::size_type rrow = rridx_it->first;
+    while (!isEnd) {
+        // update lrow and rrow
+        if (lridx_it != lhs.ridx_.end()) {
+            lrow = lridx_it->first;
+        } else {
+            lrow = maxRows; // set to past last row
         }
+        if (rridx_it != rhs.ridx_.end()) {
+            rrow = rridx_it->first;
+        } else {
+            rrow = maxRows; // set to past last row
+        }
+
+        if (lrow == rrow) {
+            // compute diff of row
+            SMatrix res_tmp = sumRow(lhs, lridx_it->second, rhs, rridx_it->second, -1);
+            // insert new row to res
+            res.insertRow(res_tmp, 0, lrow, 1); // insert from row 0 of result
+            if (lridx_it != lhs.ridx_.end()) ++lridx_it;
+            if (rridx_it != lhs.ridx_.end()) ++rridx_it;
+        } else if (lrow < rrow) {
+            // insert lrow to res
+            res.insertRow(lhs, lridx_it->second, lrow, 1);
+            if (lridx_it != lhs.ridx_.end()) ++lridx_it;
+        } else {
+            // insert rrow to res
+            res.insertRow(rhs, rridx_it->second, rrow, -1);
+            if (rridx_it != lhs.ridx_.end()) ++rridx_it;
+        }
+
+        if (lridx_it == lhs.ridx_.end() && rridx_it == rhs.ridx_.end()) 
+            isEnd = true;
     }
+    
+
+    delete [] vals_;
+    delete [] cidx_;
+    copy(res);
     return *this;
 }
 SMatrix& SMatrix::operator*=(const SMatrix& rhs) throw(MatrixError) {
@@ -796,7 +841,7 @@ void SMatrix::buildColsMap(col_map_type& map, size_type firstCol, size_type last
     }
 }
 
-SMatrix SMatrix::sumRow(const SMatrix& lhs, const SMatrix::row_loc_type lloc, const SMatrix& rhs, const SMatrix::row_loc_type rloc) {
+SMatrix SMatrix::sumRow(const SMatrix& lhs, const SMatrix::row_loc_type lloc, const SMatrix& rhs, const SMatrix::row_loc_type rloc, const int& rhsMult) {
     assert(lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols());
 
     SMatrix res(1, lhs.cols());
@@ -819,14 +864,14 @@ SMatrix SMatrix::sumRow(const SMatrix& lhs, const SMatrix::row_loc_type lloc, co
         SMatrix::size_type rcol = (ri < rsize) ? rcidx[ri] : maxCols;
         
         if (lcol == rcol) {
-            res.setVal(0, lcol, lvals[li] + rvals[li]);
+            res.setVal(0, lcol, lvals[li] + rhsMult*rvals[li]);
             if (li < lsize) ++li;
             if (ri < rsize) ++ri;
         } else if (lcol < rcol) {
             res.setVal(0, lcol, lvals[li]);
             if (li < lsize) ++li;
         } else {
-            res.setVal(0, rcol, rvals[li]);
+            res.setVal(0, rcol, rhsMult*rvals[li]);
             if (ri < rsize) ++ri;
         }
         colsInserted++;
@@ -843,7 +888,7 @@ SMatrix SMatrix::sumRow(const SMatrix& lhs, const SMatrix::row_loc_type lloc, co
  * cannot be from same matrix
  * overwrites original row
  */
-void SMatrix::insertRow(const SMatrix& fromM, const row_loc_type& loc, const size_type& toRow) {
+void SMatrix::insertRow(const SMatrix& fromM, const row_loc_type& loc, const size_type& toRow, const int& mult) {
     assert (this != &fromM && toRow < this->rows());
 
     ridx_type::iterator thisRow_it = this->ridx_.find(toRow);
@@ -854,15 +899,15 @@ void SMatrix::insertRow(const SMatrix& fromM, const row_loc_type& loc, const siz
     size_type* fromM_cidx = fromM.cidx_ + loc.first;
     for (size_t i = 0; i < loc.second; ++i) {
         // set val will be quick because values are appended
-        this->setVal(toRow, fromM_cidx[i], fromM_vals[i]);
+        this->setVal(toRow, fromM_cidx[i], mult*fromM_vals[i]);
     }
     
 }
 
-void SMatrix::insertRow(const SMatrix& fromM, const size_type& fromRow, const size_type& toRow) {
+void SMatrix::insertRow(const SMatrix& fromM, const size_type& fromRow, const size_type& toRow, const int& mult) {
     ridx_type::const_iterator it = fromM.ridx_.find(fromRow);
     if (it != fromM.ridx_.end())
-        insertRow(fromM, it->second, toRow);
+        insertRow(fromM, it->second, toRow, mult);
     else
         clearRow(toRow);
 }

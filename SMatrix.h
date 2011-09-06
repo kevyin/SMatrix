@@ -152,9 +152,9 @@ class SMatrix {
    * Build a map of cols from first to last inclusive
    */
   void buildColsMap(col_map_type&, size_type, size_type) const;
-  static SMatrix sumRow(const SMatrix&, const row_loc_type, const SMatrix&, const row_loc_type);
-  void insertRow(const SMatrix& fromM, const row_loc_type& loc, const size_type& toRow);
-  void insertRow(const SMatrix& fromM, const size_type& fromRow, const size_type& toRow);
+  static SMatrix sumRow(const SMatrix&, const row_loc_type, const SMatrix&, const row_loc_type, const int& rhsMult);
+  void insertRow(const SMatrix& fromM, const row_loc_type& loc, const size_type& toRow, const int& mult);
+  void insertRow(const SMatrix& fromM, const size_type& fromRow, const size_type& toRow, const int& mult);
   void clearRow(const size_type& row);
 
   ///////////////////////////////////////////////////////////////////////////////////////

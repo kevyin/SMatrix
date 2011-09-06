@@ -165,10 +165,8 @@ BOOST_AUTO_TEST_CASE( opij ) {
     BOOST_CHECK_EQUAL(m(6,13), 8);
 
 }
-/*
+
 BOOST_AUTO_TEST_CASE( opaddsub ) {
-    //@todo
-    return;
     cout << "operator+-" << endl;
 
     SMatrix m(2,3);
@@ -189,7 +187,11 @@ BOOST_AUTO_TEST_CASE( opaddsub ) {
 
     std::cout << "m " << m << std::endl;
     std::cout << "m1 " << m1 << std::endl;
+
     m1 += m;
+    std::cout << "m1 += m" << std::endl;
+    std::cout << "m " << m << std::endl;
+    std::cout << "m1 " << m1 << std::endl;
     BOOST_CHECK(m1 == m);
 
     SMatrix m0(2,3);
@@ -198,10 +200,10 @@ BOOST_AUTO_TEST_CASE( opaddsub ) {
     BOOST_CHECK(m2 == m);
     
     SMatrix m3 = m + m0 + m1 + m2;
-    BOOST_CHECK((m3 - m - m1) == m);
-    m3 -= m;
-    m3 -= m;
-    BOOST_CHECK((m3) == m);
+    //BOOST_CHECK((m3 - m - m1) == m);
+    //m3 -= m;
+    //m3 -= m;
+    //BOOST_CHECK((m3) == m);
 
   //SMatrix a(500000000, 1000000000);
   //for (SMatrix::size_type i = 0; i < 500; ++i)
@@ -215,9 +217,9 @@ BOOST_AUTO_TEST_CASE( opaddsub ) {
     //std::cout << "ADd sub" << std::endl;
 
    //SMatrix abadd = a + a;
+    //std::cout << "m1 " << abadd<< std::endl;
    ////SMatrix abmin = a - a;
 }
-*/
 
 BOOST_AUTO_TEST_CASE( opmult ) {
     cout << "operator*" << endl;
@@ -359,7 +361,7 @@ BOOST_AUTO_TEST_CASE( insertRows ) {
   std::cout << "b" << std::endl;
   prettyMatrix(b);
 
-  a.insertRow(b, 9, 0);
+  a.insertRow(b, 9, 0, 1);
   std::cout << "a" << std::endl;
   prettyMatrix(a);
 
